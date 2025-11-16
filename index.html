@@ -1,1312 +1,182 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Level Devil</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #0c0c0c, #1a1a1a);
-            color: #fff;
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 10px;
-            overflow: hidden;
-        }
-
-        .game-container {
-            display: flex;
-            gap: 20px;
-            width: 100%;
-            max-width: 1400px;
-            height: 95vh;
-            max-height: 95vh;
-            background: rgba(30, 30, 30, 0.95);
-            padding: 20px;
-            border-radius: 15px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.7);
-            border: 1px solid #333;
-            overflow: hidden;
-        }
-
-        .game-main {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-            min-width: 0;
-        }
-
-        .header {
-            text-align: center;
-            flex-shrink: 0;
-        }
-
-        .header h1 {
-            font-size: 2.5em;
-            background: linear-gradient(45deg, #ff0000, #ff6b00);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            text-shadow: 0 0 30px rgba(255, 0, 0, 0.5);
-            margin-bottom: 5px;
-            font-weight: 900;
-            letter-spacing: 1px;
-        }
-
-        .header .subtitle {
-            font-size: 1.1em;
-            color: #ccc;
-            font-weight: 300;
-        }
-
-        .stats {
-            display: flex;
-            justify-content: space-around;
-            background: linear-gradient(135deg, #2d2d2d, #1f1f1f);
-            padding: 12px;
-            border-radius: 10px;
-            border: 1px solid #444;
-            box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.5);
-            flex-shrink: 0;
-        }
-
-        .stat {
-            text-align: center;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-
-        .stat-label {
-            font-size: 0.8em;
-            color: #aaa;
-            margin-bottom: 3px;
-        }
-
-        .stat-value {
-            font-weight: bold;
-            color: #ffaa00;
-            font-size: 1.4em;
-            text-shadow: 0 0 10px rgba(255, 170, 0, 0.5);
-        }
-
-        .game-area {
-            flex: 1;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            background: #0a0a0a;
-            border: 3px solid #ff4444;
-            border-radius: 10px;
-            box-shadow: 0 0 20px rgba(255, 68, 68, 0.4);
-            min-height: 0;
-            overflow: hidden;
-        }
-
-        #gameCanvas {
-            image-rendering: pixelated;
-            max-width: 100%;
-            max-height: 100%;
-            width: 100%;
-            height: 100%;
-        }
-
-        .sidebar {
-            width: 300px;
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-            flex-shrink: 0;
-        }
-
-        .controls-panel {
-            background: linear-gradient(135deg, #2d2d2d, #1f1f1f);
-            padding: 20px;
-            border-radius: 10px;
-            border: 1px solid #444;
-            box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.5);
-        }
-
-        .panel-title {
-            color: #ffaa00;
-            margin-bottom: 15px;
-            font-size: 1.3em;
-            text-align: center;
-        }
-
-        .keys-container {
-            display: flex;
-            justify-content: center;
-            gap: 15px;
-            margin-bottom: 20px;
-        }
-
-        .key {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 5px;
-        }
-
-        .key-box {
-            width: 60px;
-            height: 60px;
-            background: linear-gradient(135deg, #444, #222);
-            border: 2px solid #666;
-            border-radius: 8px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-size: 1.4em;
-            font-weight: bold;
-            color: #fff;
-            box-shadow: 0 3px 0 #222;
-            transition: all 0.1s;
-        }
-
-        .key-box.active {
-            transform: translateY(3px);
-            box-shadow: 0 0px 0 #222;
-            background: linear-gradient(135deg, #ffaa00, #ff7700);
-            color: #000;
-        }
-
-        .key-label {
-            font-size: 0.8em;
-            color: #aaa;
-        }
-
-        .level-nav {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 15px;
-            margin: 15px 0;
-        }
-
-        .nav-btn {
-            padding: 10px 15px;
-            background: linear-gradient(135deg, #444, #222);
-            border: 2px solid #555;
-            border-radius: 8px;
-            color: #fff;
-            cursor: pointer;
-            font-weight: bold;
-            font-size: 0.9em;
-            transition: all 0.3s;
-            min-width: 80px;
-        }
-
-        .nav-btn:hover:not(:disabled) {
-            background: linear-gradient(135deg, #555, #333);
-            transform: translateY(-2px);
-        }
-
-        .nav-btn:disabled {
-            background: linear-gradient(135deg, #333, #111);
-            color: #666;
-            border-color: #444;
-            cursor: not-allowed;
-        }
-
-        .page-info {
-            color: #ffaa00;
-            font-weight: bold;
-            font-size: 1em;
-        }
-
-        .levels-panel {
-            background: linear-gradient(135deg, #2d2d2d, #1f1f1f);
-            padding: 20px;
-            border-radius: 10px;
-            border: 1px solid #444;
-            box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.5);
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-        }
-
-        .level-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 15px;
-        }
-
-        .level-title {
-            color: #ffaa00;
-            font-size: 1.2em;
-            font-weight: bold;
-        }
-
-        .dashboard-btn {
-            background: linear-gradient(135deg, #444, #222);
-            border: 2px solid #555;
-            border-radius: 6px;
-            color: #fff;
-            cursor: pointer;
-            padding: 5px 10px;
-            font-size: 1.2em;
-            transition: all 0.3s;
-        }
-
-        .dashboard-btn:hover {
-            background: linear-gradient(135deg, #555, #333);
-            transform: translateY(-1px);
-        }
-
-        .level-select {
-            display: grid;
-            grid-template-columns: repeat(5, 1fr);
-            gap: 8px;
-            flex: 1;
-            overflow-y: auto;
-            padding-right: 5px;
-        }
-
-        .level-select::-webkit-scrollbar {
-            width: 6px;
-        }
-
-        .level-select::-webkit-scrollbar-track {
-            background: #2d2d2d;
-            border-radius: 3px;
-        }
-
-        .level-select::-webkit-scrollbar-thumb {
-            background: #ff4444;
-            border-radius: 3px;
-        }
-
-        .level-btn {
-            padding: 12px 8px;
-            background: linear-gradient(135deg, #444, #222);
-            border: 2px solid #555;
-            border-radius: 6px;
-            color: #fff;
-            cursor: pointer;
-            font-weight: bold;
-            font-size: 0.9em;
-            transition: all 0.3s;
-            text-align: center;
-        }
-
-        .level-btn:hover:not(.locked) {
-            background: linear-gradient(135deg, #555, #333);
-            transform: translateY(-1px);
-        }
-
-        .level-btn:active {
-            transform: translateY(1px);
-        }
-
-        .level-btn.active {
-            background: linear-gradient(135deg, #ff4444, #cc0000);
-            border-color: #ffaa00;
-            box-shadow: 0 0 10px rgba(255, 68, 68, 0.7);
-        }
-
-        .level-btn.completed {
-            background: linear-gradient(135deg, #44ff44, #00cc00);
-            color: #000;
-            border-color: #88ff88;
-        }
-
-        .level-btn.locked {
-            background: linear-gradient(135deg, #333, #111);
-            color: #666;
-            border-color: #444;
-            cursor: not-allowed;
-            box-shadow: none;
-        }
-
-        .level-btn.locked:hover {
-            transform: none;
-            background: linear-gradient(135deg, #333, #111);
-        }
-
-        .instructions {
-            background: linear-gradient(135deg, #2d2d2d, #1f1f1f);
-            padding: 12px;
-            border-radius: 8px;
-            border: 1px solid #444;
-            margin-top: 10px;
-            font-size: 0.8em;
-            color: #aaa;
-            text-align: center;
-        }
-
-        .difficulty-badge {
-            display: inline-block;
-            padding: 3px 8px;
-            border-radius: 10px;
-            font-size: 0.7em;
-            font-weight: bold;
-            margin-left: 8px;
-        }
-
-        .difficulty-easy { background: #44ff44; color: #000; }
-        .difficulty-medium { background: #ffaa00; color: #000; }
-        .difficulty-hard { background: #ff4444; color: #fff; }
-        .difficulty-expert { background: #aa00ff; color: #fff; }
-        .difficulty-insane { background: #000; color: #fff; border: 1px solid #ff0000; }
-
-        .message {
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background: linear-gradient(135deg, #2d2d2d, #1a1a1a);
-            padding: 30px;
-            border-radius: 15px;
-            border: 3px solid #ff4444;
-            box-shadow: 0 0 40px rgba(255, 0, 0, 0.5);
-            text-align: center;
-            z-index: 100;
-            display: none;
-            max-width: 90vw;
-            width: 400px;
-        }
-
-        .message h2 {
-            color: #ff4444;
-            margin-bottom: 15px;
-            font-size: 2em;
-            text-shadow: 0 0 10px rgba(255, 0, 0, 0.5);
-        }
-
-        .message p {
-            margin: 10px 0;
-            font-size: 1.1em;
-            color: #ccc;
-        }
-
-        .message .stats {
-            background: rgba(0, 0, 0, 0.3);
-            margin: 15px 0;
-            padding: 10px;
-        }
-
-        .message button {
-            background: linear-gradient(135deg, #ff4444, #cc0000);
-            color: white;
-            border: none;
-            padding: 12px 25px;
-            margin: 8px 8px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 1.1em;
-            font-weight: bold;
-            transition: all 0.3s;
-            box-shadow: 0 3px 0 #990000;
-        }
-
-        .message button:hover {
-            background: linear-gradient(135deg, #ff6666, #dd0000);
-            transform: translateY(-2px);
-            box-shadow: 0 5px 0 #990000;
-        }
-
-        .message button:active {
-            transform: translateY(2px);
-            box-shadow: 0 1px 0 #990000;
-        }
-
-        .death-animation {
-            position: absolute;
-            background: radial-gradient(circle, #ff4444, transparent);
-            border-radius: 50%;
-            pointer-events: none;
-            animation: deathPulse 0.6s ease-out;
-        }
-
-        @keyframes deathPulse {
-            0% { transform: scale(0.5); opacity: 1; }
-            100% { transform: scale(4); opacity: 0; }
-        }
-
-        /* Mobile-specific styles */
-        @media (max-width: 1024px) {
-            .game-container {
-                flex-direction: column;
-                height: 98vh;
-            }
-            
-            .sidebar {
-                width: 100%;
-                flex-direction: row;
-            }
-            
-            .controls-panel {
-                flex: 1;
-            }
-            
-            .levels-panel {
-                flex: 2;
-            }
-        }
-
-        @media (max-width: 768px) {
-            .sidebar {
-                flex-direction: column;
-            }
-            
-            .keys-container {
-                gap: 10px;
-            }
-            
-            .key-box {
-                width: 50px;
-                height: 50px;
-                font-size: 1.2em;
-            }
-            
-            .level-select {
-                grid-template-columns: repeat(4, 1fr);
-            }
-        }
-
-        @media (max-width: 480px) {
-            .game-container {
-                padding: 10px;
-            }
-            
-            .header h1 {
-                font-size: 2em;
-            }
-            
-            .level-select {
-                grid-template-columns: repeat(3, 1fr);
-            }
-            
-            .level-btn {
-                padding: 10px 6px;
-                font-size: 0.8em;
-            }
-        }
-    </style>
+    <title>Zamx</title>
+    <link rel="icon" type="image/svg+xml"
+        href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect fill='%233498db' width='100' height='100'/><text x='50' y='50' font-size='70' fill='white' text-anchor='middle' dy='.3em'>Z</text></svg>">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/bootstrap-custom.css">
 </head>
+
 <body>
-    <div class="game-container">
-        <!-- Main Game Area -->
-        <div class="game-main">
-            <div class="header">
-                <h1>LEVEL DEVIL</h1>
-                <div class="subtitle">Smart Difficulty System - All Levels Working!</div>
+    <div class="modal fade" id="authModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Login / Register</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="authForm">
+                        <div class="mb-3">
+                            <label class="form-label">Username</label>
+                            <input type="text" class="form-control" id="username" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Password</label>
+                            <input type="password" class="form-control" id="password" required>
+                        </div>
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary" id="loginBtn">Login</button>
+                            <button type="button" class="btn btn-outline-secondary" id="registerBtn">Register</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="container py-4">
+        <header class="text-center mb-4">
+            <div class="d-flex justify-content-between align-items-center">
+                <button class="btn btn-outline-light btn-sm" id="authBtn">
+                    <i class="fas fa-user me-2"></i>Login
+                </button>
+                <div>
+                    <h1 class="display-4 game-title">ZAMX</h1>
+                    <p class="lead game-subtitle">The Ultimate Rage Platformer</p>
+                </div>
+                <div class="user-info" id="userInfo" style="display: none;">
+                    <span class="me-2">Welcome, <span id="userDisplayName">User</span></span>
+                    <button class="btn btn-outline-light btn-sm" id="logoutBtn">Logout</button>
+                </div>
+            </div>
+        </header>
+        <div class="game-container">
+            <canvas id="gameCanvas"></canvas>
+            <div class="ui-overlay">
+                <div class="death-counter">
+                    <i class="fas fa-skull-crossbones me-2"></i>
+                    <span id="deathCount">0</span>
+                </div>
+                <div class="timer">
+                    <i class="fas fa-clock me-2"></i>
+                    <span id="timer">0:00</span>
+                </div>
+                <div class="level-progress">
+                    Level: <span id="currentLevel">1</span>/<span id="totalLevels">200</span>
+                </div>
             </div>
 
-            <div class="stats">
-                <div class="stat">
-                    <div class="stat-label">LEVEL</div>
-                    <div class="stat-value" id="currentLevel">1</div>
-                </div>
-                <div class="stat">
-                    <div class="stat-label">DEATHS</div>
-                    <div class="stat-value" id="deathCount">0</div>
-                </div>
-                <div class="stat">
-                    <div class="stat-label">TIME</div>
-                    <div class="stat-value" id="timer">0.0s</div>
+            
+            <div class="mobile-controls">
+                <button id="leftBtn"><i class="fas fa-arrow-left"></i></button>
+                <button id="jumpBtn"><i class="fas fa-arrow-up"></i></button>
+                <button id="rightBtn"><i class="fas fa-arrow-right"></i></button>
+            </div>
+
+            
+            <div class="start-screen" id="startScreen">
+                <h2>ZAMX</h2>
+                <p>Guide the blue square to the green door. Beware of traps!</p>
+                <button class="btn btn-primary btn-lg" id="startBtn">Start Game</button>
+                <button class="btn btn-outline-light mt-3" id="levelSelectBtn">Level Select</button>
+                <div class="controls-info">
+                    <p><kbd>←</kbd> <kbd>→</kbd> Move | <kbd>↑</kbd> <kbd>Space</kbd> Jump</p>
                 </div>
             </div>
 
-            <div class="game-area">
-                <canvas id="gameCanvas"></canvas>
+            <div class="level-select-screen hidden" id="levelSelectScreen">
+                <h2>Select Level</h2>
+                <div class="level-grid" id="levelGrid"></div>
+                <button class="btn btn-outline-light mt-3" id="backToMenuBtn">Back to Menu</button>
+            </div>
+
+            <div class="level-complete hidden" id="levelComplete">
+                <h2>Level Complete!</h2>
+                <p>Time: <span id="levelTime">0:00</span></p>
+                <p>Deaths: <span id="levelDeaths">0</span></p>
+                <button class="btn btn-success btn-lg" id="nextLevelBtn">Next Level</button>
+            </div>
+
+            <div class="game-over hidden" id="gameOver">
+                <h2>Game Complete!</h2>
+                <p>Total Time: <span id="totalTime">0:00</span></p>
+                <p>Total Deaths: <span id="totalDeaths">0</span></p>
+                <button class="btn btn-primary btn-lg" id="restartBtn">Play Again</button>
             </div>
         </div>
 
-        <!-- Sidebar with Controls and Levels -->
-        <div class="sidebar">
-            <!-- Controls Panel -->
-            <div class="controls-panel">
-                <div class="panel-title">CONTROLS</div>
-                <div class="keys-container">
-                    <div class="key">
-                        <div class="key-box" id="leftKey">←</div>
-                        <div class="key-label">LEFT</div>
-                    </div>
-                    <div class="key">
-                        <div class="key-box" id="rightKey">→</div>
-                        <div class="key-label">RIGHT</div>
-                    </div>
-                    <div class="key">
-                        <div class="key-box" id="upKey">↑</div>
-                        <div class="key-label">JUMP</div>
-                    </div>
-                </div>
-                
-                <div class="level-nav">
-                    <button class="nav-btn" id="prevPage">◀ PREV</button>
-                    <span class="page-info">Pages: <span id="currentPage">1</span>/<span id="totalPages">3</span></span>
-                    <button class="nav-btn" id="nextPage">NEXT ▶</button>
-                </div>
-            </div>
+      
+        <div class="controls" role="toolbar" aria-label="Game controls">
+            <button class="ctrl-btn" id="restartLevelBtn" title="Restart Level">
+                <i class="fas fa-redo"></i>
+            </button>
+            <button class="ctrl-btn" id="soundToggle" title="Toggle Sound">
+                <i class="fas fa-volume-up" id="soundIcon"></i>
+            </button>
+            <button class="ctrl-btn" id="musicToggle" title="Toggle Music">
+                <i class="fas fa-music" id="musicIcon"></i>
+            </button>
+            <button class="ctrl-btn" id="scaleToggle" title="Toggle Scale Mode">
+                <i class="fas fa-expand" id="scaleIcon"></i>
+            </button>
+        </div>
 
-            <!-- Levels Panel -->
-            <div class="levels-panel">
-                <div class="level-header">
-                    <div class="level-title">
-                        SELECT LEVEL 
-                        <span class="difficulty-badge" id="difficultyBadge">EASY</span>
+        
+        <div class="row mt-4">
+            <div class="col-md-6">
+                <h3>How to Play</h3>
+                <ul>
+                    <li>Use arrow keys or WASD to move and jump</li>
+                    <li>Reach the green door to complete the level</li>
+                    <li>Avoid spikes, traps, and fake platforms</li>
+                    <li>Watch for invisible walls and reverse controls!</li>
+                </ul>
+            </div>
+            <div class="col-md-6">
+                <h3>Trap Types</h3>
+                <div class="trap-legend">
+                    <div class="trap-item" data-trap="spike">
+                        <div class="trap-icon spike"></div>
+                        <span>Spikes</span>
                     </div>
-                    <button class="dashboard-btn" title="Dashboard">☰</button>
-                </div>
-                
-                <div class="level-select" id="levelGrid">
-                    <!-- Levels will be generated here -->
-                </div>
-                
-                <div class="instructions">
-                    New Difficulty System: Platform Patterns, Enemy AI, and Special Mechanics!
+                    <div class="trap-item" data-trap="fake">
+                        <div class="trap-icon fake"></div>
+                        <span>Fake Platforms</span>
+                    </div>
+                    <div class="trap-item" data-trap="collapse">
+                        <div class="trap-icon collapse"></div>
+                        <span>Collapsing</span>
+                    </div>
+                    <div class="trap-item" data-trap="moving">
+                        <div class="trap-icon moving"></div>
+                        <span>Moving</span>
+                    </div>
+                    <div class="trap-item" data-trap="invisible">
+                        <div class="trap-icon invisible"></div>
+                        <span>Invisible</span>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 
-    <div class="message" id="levelComplete">
-        <h2>LEVEL COMPLETE!</h2>
-        <div class="stats">
-            <div class="stat">
-                <div class="stat-label">DEATHS</div>
-                <div class="stat-value" id="levelDeaths">0</div>
-            </div>
-            <div class="stat">
-                <div class="stat-label">TIME</div>
-                <div class="stat-value" id="levelTime">0.0s</div>
-            </div>
-        </div>
-        <button id="nextLevel">NEXT LEVEL</button>
-    </div>
-
-    <div class="message" id="gameComplete">
-        <h2>CONGRATULATIONS!</h2>
-        <p>You've beaten Level Devil!</p>
-        <div class="stats">
-            <div class="stat">
-                <div class="stat-label">TOTAL DEATHS</div>
-                <div class="stat-value" id="totalDeaths">0</div>
-            </div>
-            <div class="stat">
-                <div class="stat-label">TOTAL TIME</div>
-                <div class="stat-value" id="totalTime">0.0s</div>
-            </div>
-        </div>
-        <button id="playAgain">PLAY AGAIN</button>
-    </div>
-
-    <script>
-        class LevelDevil {
-            constructor() {
-                this.canvas = document.getElementById('gameCanvas');
-                this.ctx = this.canvas.getContext('2d');
-                this.currentLevel = 1;
-                this.totalLevels = 50;
-                this.deathCount = 0;
-                this.startTime = Date.now();
-                this.levelStartTime = Date.now();
-                this.levelDeaths = 0;
-                this.gameRunning = true;
-                this.keys = {};
-                this.completedLevels = new Set([1]);
-                this.currentPage = 1;
-                this.levelsPerPage = 20;
-                
-                // Increase player size and speed for better gameplay
-                this.player = {
-                    x: 50,
-                    y: 450,
-                    width: 30, // Increased from 24
-                    height: 30, // Increased from 24
-                    velocityX: 0,
-                    velocityY: 0,
-                    speed: 8, // Increased from 6
-                    jumpPower: 16, // Increased from 14
-                    grounded: false,
-                    color: '#ffaa00'
-                };
-
-                this.setupEventListeners();
-                this.resizeCanvas();
-                this.currentLevelData = this.generateLevel(1);
-                this.generateLevelGrid();
-                this.updateLevelButtons();
-                this.updateDifficultyBadge();
-                this.gameLoop();
-                this.updateTimer();
-
-                // Handle window resize
-                window.addEventListener('resize', () => {
-                    this.resizeCanvas();
-                });
-            }
-
-            resizeCanvas() {
-                const gameArea = document.querySelector('.game-area');
-                const width = gameArea.clientWidth;
-                const height = gameArea.clientHeight;
-                
-                this.canvas.width = width;
-                this.canvas.height = height;
-                
-                // Regenerate current level to fit new canvas size
-                if (this.currentLevelData) {
-                    this.currentLevelData = this.generateLevel(this.currentLevel);
-                    this.player.x = this.currentLevelData.start.x;
-                    this.player.y = this.currentLevelData.start.y;
-                }
-            }
-
-            getDifficultyTier(level) {
-                if (level <= 10) return 'easy';
-                if (level <= 20) return 'medium';
-                if (level <= 30) return 'hard';
-                if (level <= 40) return 'expert';
-                return 'insane';
-            }
-
-            updateDifficultyBadge() {
-                const badge = document.getElementById('difficultyBadge');
-                const tier = this.getDifficultyTier(this.currentLevel);
-                
-                badge.textContent = tier.toUpperCase();
-                badge.className = 'difficulty-badge difficulty-' + tier;
-            }
-
-            generateLevel(levelNumber) {
-                const tier = this.getDifficultyTier(levelNumber);
-                const canvas = this.canvas;
-                const level = {
-                    platforms: [],
-                    spikes: [],
-                    enemies: [],
-                    movingPlatforms: [],
-                    disappearingPlatforms: [],
-                    goal: { x: canvas.width - 80, y: 100, width: 40, height: 50 },
-                    start: { x: 50, y: canvas.height - 80 }
-                };
-
-                // Always start with ground platform
-                level.platforms.push({ 
-                    x: 0, 
-                    y: canvas.height - 40, 
-                    width: canvas.width, 
-                    height: 40 
-                });
-
-                // Scale parameters based on canvas size
-                const scaleX = canvas.width / 800;
-                const scaleY = canvas.height / 500;
-
-                // Base parameters based on difficulty tier
-                const params = {
-                    easy: { platforms: 4, spikes: 2, gap: 150 * scaleX, platformWidth: 120 * scaleX },
-                    medium: { platforms: 6, spikes: 4, gap: 130 * scaleX, platformWidth: 100 * scaleX },
-                    hard: { platforms: 8, spikes: 6, gap: 110 * scaleX, platformWidth: 80 * scaleX },
-                    expert: { platforms: 10, spikes: 8, gap: 90 * scaleX, platformWidth: 70 * scaleX },
-                    insane: { platforms: 12, spikes: 10, gap: 80 * scaleX, platformWidth: 60 * scaleX }
-                }[tier];
-
-                let lastX = 100 * scaleX;
-                let lastY = (canvas.height - 150) * scaleY;
-
-                // Generate main path with different patterns based on tier
-                for (let i = 0; i < params.platforms; i++) {
-                    const heightVariation = {
-                        easy: 80 * scaleY,
-                        medium: 120 * scaleY,
-                        hard: 160 * scaleY,
-                        expert: 200 * scaleY,
-                        insane: 250 * scaleY
-                    }[tier];
-
-                    const height = Math.max(
-                        canvas.height * 0.3, 
-                        Math.min(canvas.height * 0.7, lastY + (Math.random() - 0.5) * heightVariation)
-                    );
-                    
-                    level.platforms.push({
-                        x: lastX,
-                        y: height,
-                        width: params.platformWidth,
-                        height: 25
-                    });
-
-                    // Add spikes based on difficulty
-                    if (i > 0 && Math.random() < 0.6) {
-                        level.spikes.push({
-                            x: lastX - 50 * scaleX,
-                            y: canvas.height - 50,
-                            width: 100 * scaleX,
-                            height: 25
-                        });
-                    }
-
-                    lastX += params.platformWidth + params.gap;
-                    lastY = height;
-                }
-
-                // ADD SPECIAL MECHANICS BASED ON DIFFICULTY
-
-                // Moving Platforms (Medium+)
-                if (tier >= 'medium') {
-                    const movingCount = tier === 'medium' ? 1 : tier === 'hard' ? 2 : 3;
-                    for (let i = 0; i < movingCount; i++) {
-                        const movingPlat = {
-                            x: 200 * scaleX + i * 200 * scaleX,
-                            y: (canvas.height - 200) * scaleY - i * 60 * scaleY,
-                            width: 100 * scaleX,
-                            height: 20,
-                            moving: true,
-                            speed: (1.5 + (levelNumber * 0.05)) * scaleX,
-                            minX: 150 * scaleX + i * 200 * scaleX,
-                            maxX: 400 * scaleX + i * 200 * scaleX,
-                            direction: 1
-                        };
-                        level.platforms.push(movingPlat);
-                        level.movingPlatforms.push(movingPlat);
-                    }
-                }
-
-                // Disappearing Platforms (Hard+)
-                if (tier >= 'hard') {
-                    const disappearingCount = tier === 'hard' ? 1 : 2;
-                    for (let i = 0; i < disappearingCount; i++) {
-                        const disappearPlat = {
-                            x: 300 * scaleX + i * 250 * scaleX,
-                            y: (canvas.height - 250) * scaleY - i * 80 * scaleY,
-                            width: 80 * scaleX,
-                            height: 20,
-                            disappearing: true,
-                            timer: 0,
-                            visible: true,
-                            cooldown: 120 // frames
-                        };
-                        level.platforms.push(disappearPlat);
-                        level.disappearingPlatforms.push(disappearPlat);
-                    }
-                }
-
-                // Enemy AI (Expert+)
-                if (tier >= 'expert') {
-                    const enemyCount = tier === 'expert' ? 1 : 2;
-                    for (let i = 0; i < enemyCount; i++) {
-                        level.enemies.push({
-                            x: 250 * scaleX + i * 300 * scaleX,
-                            y: canvas.height - 80,
-                            width: 25 * scaleX,
-                            height: 25,
-                            speed: (1.2 + (levelNumber * 0.02)) * scaleX,
-                            direction: 1,
-                            patrolMin: 200 * scaleX + i * 300 * scaleX,
-                            patrolMax: 450 * scaleX + i * 300 * scaleX
-                        });
-                    }
-                }
-
-                // Ceiling Spikes (Insane)
-                if (tier === 'insane') {
-                    for (let i = 0; i < 3; i++) {
-                        level.spikes.push({
-                            x: 150 * scaleX + i * 250 * scaleX,
-                            y: 50,
-                            width: 120 * scaleX,
-                            height: 25
-                        });
-                    }
-                }
-
-                // Position goal
-                level.goal.x = lastX - 60 * scaleX;
-                level.goal.y = lastY - 50;
-
-                // Ensure goal is reachable
-                if (level.goal.x > canvas.width - 80) level.goal.x = canvas.width - 80;
-                if (level.goal.y < 100) level.goal.y = 100;
-
-                return level;
-            }
-
-            setupEventListeners() {
-                document.addEventListener('keydown', (e) => {
-                    if (['ArrowLeft', 'ArrowRight', 'ArrowUp', 'a', 'd', 'w', ' '].includes(e.key)) {
-                        this.keys[e.key] = true;
-                        this.updateKeyDisplay();
-                        e.preventDefault();
-                    }
-                });
-
-                document.addEventListener('keyup', (e) => {
-                    if (['ArrowLeft', 'ArrowRight', 'ArrowUp', 'a', 'd', 'w', ' '].includes(e.key)) {
-                        this.keys[e.key] = false;
-                        this.updateKeyDisplay();
-                        e.preventDefault();
-                    }
-                });
-
-                document.getElementById('nextLevel').addEventListener('click', () => {
-                    this.nextLevel();
-                });
-
-                document.getElementById('playAgain').addEventListener('click', () => {
-                    this.restartGame();
-                });
-
-                document.getElementById('prevPage').addEventListener('click', () => {
-                    if (this.currentPage > 1) {
-                        this.currentPage--;
-                        this.generateLevelGrid();
-                    }
-                });
-
-                document.getElementById('nextPage').addEventListener('click', () => {
-                    const totalPages = Math.ceil(this.totalLevels / this.levelsPerPage);
-                    if (this.currentPage < totalPages) {
-                        this.currentPage++;
-                        this.generateLevelGrid();
-                    }
-                });
-
-                // Dashboard button
-                document.querySelector('.dashboard-btn').addEventListener('click', () => {
-                    alert('Dashboard feature coming soon!');
-                });
-
-                document.getElementById('levelGrid').addEventListener('click', (e) => {
-                    if (e.target.classList.contains('level-btn')) {
-                        const level = parseInt(e.target.dataset.level);
-                        if (!e.target.classList.contains('locked')) {
-                            this.loadLevel(level);
-                        }
-                    }
-                });
-            }
-
-            generateLevelGrid() {
-                const levelGrid = document.getElementById('levelGrid');
-                levelGrid.innerHTML = '';
-                
-                const startLevel = (this.currentPage - 1) * this.levelsPerPage + 1;
-                const endLevel = Math.min(this.currentPage * this.levelsPerPage, this.totalLevels);
-                
-                for (let i = startLevel; i <= endLevel; i++) {
-                    const btn = document.createElement('button');
-                    btn.className = 'level-btn';
-                    btn.textContent = i;
-                    btn.dataset.level = i;
-                    
-                    // Add difficulty color hint
-                    const tier = this.getDifficultyTier(i);
-                    btn.style.borderColor = {
-                        easy: '#44ff44',
-                        medium: '#ffaa00', 
-                        hard: '#ff4444',
-                        expert: '#aa00ff',
-                        insane: '#ff0000'
-                    }[tier];
-                    
-                    levelGrid.appendChild(btn);
-                }
-                
-                this.updateLevelButtons();
-                this.updatePageInfo();
-            }
-
-            updatePageInfo() {
-                const totalPages = Math.ceil(this.totalLevels / this.levelsPerPage);
-                document.getElementById('currentPage').textContent = this.currentPage;
-                document.getElementById('totalPages').textContent = totalPages;
-                
-                document.getElementById('prevPage').disabled = this.currentPage === 1;
-                document.getElementById('nextPage').disabled = this.currentPage === totalPages;
-            }
-
-            updateKeyDisplay() {
-                const leftKey = document.getElementById('leftKey');
-                const rightKey = document.getElementById('rightKey');
-                const upKey = document.getElementById('upKey');
-
-                leftKey.classList.toggle('active', this.keys['ArrowLeft'] || this.keys['a']);
-                rightKey.classList.toggle('active', this.keys['ArrowRight'] || this.keys['d']);
-                upKey.classList.toggle('active', this.keys['ArrowUp'] || this.keys['w'] || this.keys[' ']);
-            }
-
-            updateLevelButtons() {
-                document.querySelectorAll('.level-btn').forEach(btn => {
-                    const level = parseInt(btn.dataset.level);
-                    
-                    btn.classList.remove('active', 'completed', 'locked');
-                    
-                    if (level === this.currentLevel) {
-                        btn.classList.add('active');
-                    } else if (this.completedLevels.has(level)) {
-                        btn.classList.add('completed');
-                    } else if (level === 1 || this.completedLevels.has(level - 1)) {
-                        // Level is unlocked but not completed
-                    } else {
-                        btn.classList.add('locked');
-                    }
-                });
-            }
-
-            loadLevel(level) {
-                this.currentLevel = level;
-                this.currentLevelData = this.generateLevel(level);
-                this.player.x = this.currentLevelData.start.x;
-                this.player.y = this.currentLevelData.start.y;
-                this.player.velocityX = 0;
-                this.player.velocityY = 0;
-                this.levelStartTime = Date.now();
-                this.levelDeaths = 0;
-                this.gameRunning = true;
-
-                document.getElementById('currentLevel').textContent = level;
-                document.getElementById('levelComplete').style.display = 'none';
-                document.getElementById('gameComplete').style.display = 'none';
-
-                this.updateLevelButtons();
-                this.updateDifficultyBadge();
-            }
-
-            nextLevel() {
-                this.completedLevels.add(this.currentLevel);
-                if (this.currentLevel < this.totalLevels) {
-                    this.completedLevels.add(this.currentLevel + 1);
-                    this.loadLevel(this.currentLevel + 1);
-                } else {
-                    this.showGameComplete();
-                }
-            }
-
-            showLevelComplete() {
-                const levelTime = ((Date.now() - this.levelStartTime) / 1000).toFixed(1);
-                document.getElementById('levelDeaths').textContent = this.levelDeaths;
-                document.getElementById('levelTime').textContent = levelTime + 's';
-                document.getElementById('levelComplete').style.display = 'block';
-            }
-
-            showGameComplete() {
-                const totalTime = ((Date.now() - this.startTime) / 1000).toFixed(1);
-                document.getElementById('totalDeaths').textContent = this.deathCount;
-                document.getElementById('totalTime').textContent = totalTime + 's';
-                document.getElementById('gameComplete').style.display = 'block';
-            }
-
-            restartGame() {
-                this.currentLevel = 1;
-                this.deathCount = 0;
-                this.startTime = Date.now();
-                this.completedLevels = new Set([1]);
-                this.loadLevel(1);
-                document.getElementById('deathCount').textContent = '0';
-                this.generateLevelGrid();
-            }
-
-            updateTimer() {
-                const currentTime = ((Date.now() - this.startTime) / 1000).toFixed(1);
-                document.getElementById('timer').textContent = currentTime + 's';
-                
-                if (this.gameRunning) {
-                    requestAnimationFrame(() => this.updateTimer());
-                }
-            }
-
-            handleInput() {
-                this.player.velocityX = 0;
-
-                if (this.keys['ArrowLeft'] || this.keys['a']) {
-                    this.player.velocityX = -this.player.speed;
-                }
-                if (this.keys['ArrowRight'] || this.keys['d']) {
-                    this.player.velocityX = this.player.speed;
-                }
-                if ((this.keys['ArrowUp'] || this.keys['w'] || this.keys[' ']) && this.player.grounded) {
-                    this.player.velocityY = -this.player.jumpPower;
-                    this.player.grounded = false;
-                }
-            }
-
-            updatePhysics() {
-                // Update moving platforms
-                this.currentLevelData.movingPlatforms.forEach(platform => {
-                    platform.x += platform.speed * platform.direction;
-                    if (platform.x >= platform.maxX || platform.x <= platform.minX) {
-                        platform.direction *= -1;
-                    }
-                });
-
-                // Update disappearing platforms
-                this.currentLevelData.disappearingPlatforms.forEach(platform => {
-                    platform.timer++;
-                    if (platform.timer >= platform.cooldown) {
-                        platform.visible = !platform.visible;
-                        platform.timer = 0;
-                    }
-                });
-
-                // Update enemies
-                this.currentLevelData.enemies.forEach(enemy => {
-                    enemy.x += enemy.speed * enemy.direction;
-                    if (enemy.x >= enemy.patrolMax || enemy.x <= enemy.patrolMin) {
-                        enemy.direction *= -1;
-                    }
-
-                    // Enemy collision
-                    if (this.checkCollision(this.player, enemy)) {
-                        this.die();
-                    }
-                });
-
-                // Apply gravity
-                this.player.velocityY += 0.5;
-
-                // Update player position
-                this.player.x += this.player.velocityX;
-                this.player.y += this.player.velocityY;
-
-                // Boundary checking
-                if (this.player.x < 0) this.player.x = 0;
-                if (this.player.x > this.canvas.width - this.player.width) {
-                    this.player.x = this.canvas.width - this.player.width;
-                }
-
-                // Reset grounded state
-                this.player.grounded = false;
-
-                // Platform collisions
-                this.currentLevelData.platforms.forEach(platform => {
-                    // Skip invisible disappearing platforms
-                    if (platform.disappearing && !platform.visible) return;
-                    
-                    if (this.checkCollision(this.player, platform)) {
-                        // Coming from above - landing on platform
-                        if (this.player.velocityY > 0 && this.player.y + this.player.height - this.player.velocityY <= platform.y) {
-                            this.player.y = platform.y - this.player.height;
-                            this.player.velocityY = 0;
-                            this.player.grounded = true;
-                        }
-                        // Coming from below - hitting platform bottom
-                        else if (this.player.velocityY < 0 && this.player.y - this.player.velocityY >= platform.y + platform.height) {
-                            this.player.y = platform.y + platform.height;
-                            this.player.velocityY = 0;
-                        }
-                        // Horizontal collision
-                        else if (this.player.velocityX !== 0) {
-                            if (this.player.x + this.player.width - this.player.velocityX <= platform.x) {
-                                this.player.x = platform.x - this.player.width;
-                            } else if (this.player.x - this.player.velocityX >= platform.x + platform.width) {
-                                this.player.x = platform.x + platform.width;
-                            }
-                        }
-                    }
-                });
-
-                // Spike collisions
-                this.currentLevelData.spikes.forEach(spike => {
-                    if (this.checkCollision(this.player, spike)) {
-                        this.die();
-                    }
-                });
-
-                // Goal collision
-                if (this.checkCollision(this.player, this.currentLevelData.goal)) {
-                    this.showLevelComplete();
-                    this.gameRunning = false;
-                }
-
-                // Fall death
-                if (this.player.y > this.canvas.height) {
-                    this.die();
-                }
-            }
-
-            checkCollision(rect1, rect2) {
-                return rect1.x < rect2.x + rect2.width &&
-                       rect1.x + rect1.width > rect2.x &&
-                       rect1.y < rect2.y + rect2.height &&
-                       rect1.y + rect1.height > rect2.y;
-            }
-
-            die() {
-                this.deathCount++;
-                this.levelDeaths++;
-                document.getElementById('deathCount').textContent = this.deathCount;
-                
-                // Create death animation
-                const deathAnim = document.createElement('div');
-                deathAnim.className = 'death-animation';
-                deathAnim.style.left = (this.player.x + this.player.width/2 - 10) + 'px';
-                deathAnim.style.top = (this.player.y + this.player.height/2 - 10) + 'px';
-                deathAnim.style.width = '20px';
-                deathAnim.style.height = '20px';
-                document.body.appendChild(deathAnim);
-                
-                setTimeout(() => {
-                    if (deathAnim.parentNode) {
-                        document.body.removeChild(deathAnim);
-                    }
-                }, 600);
-
-                // Reset player position
-                this.player.x = this.currentLevelData.start.x;
-                this.player.y = this.currentLevelData.start.y;
-                this.player.velocityX = 0;
-                this.player.velocityY = 0;
-            }
-
-            render() {
-                // Clear canvas with gradient
-                const gradient = this.ctx.createLinearGradient(0, 0, 0, this.canvas.height);
-                gradient.addColorStop(0, '#0a0a0a');
-                gradient.addColorStop(1, '#1a1a1a');
-                this.ctx.fillStyle = gradient;
-                this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
-
-                // Draw platforms
-                this.currentLevelData.platforms.forEach(platform => {
-                    // Skip invisible disappearing platforms
-                    if (platform.disappearing && !platform.visible) return;
-                    
-                    // Platform shadow
-                    this.ctx.fillStyle = 'rgba(0, 0, 0, 0.3)';
-                    this.ctx.fillRect(platform.x + 3, platform.y + 3, platform.width, platform.height);
-                    
-                    // Main platform with different colors for special types
-                    let platGradient;
-                    if (platform.moving) {
-                        platGradient = this.ctx.createLinearGradient(platform.x, platform.y, platform.x, platform.y + platform.height);
-                        platGradient.addColorStop(0, '#8888ff');
-                        platGradient.addColorStop(1, '#4444aa');
-                    } else if (platform.disappearing) {
-                        const alpha = platform.visible ? 1 : 0.3;
-                        platGradient = this.ctx.createLinearGradient(platform.x, platform.y, platform.x, platform.y + platform.height);
-                        platGradient.addColorStop(0, `rgba(255, 255, 0, ${alpha})`);
-                        platGradient.addColorStop(1, `rgba(200, 200, 0, ${alpha})`);
-                    } else {
-                        platGradient = this.ctx.createLinearGradient(platform.x, platform.y, platform.x, platform.y + platform.height);
-                        platGradient.addColorStop(0, '#666');
-                        platGradient.addColorStop(1, '#333');
-                    }
-                    this.ctx.fillStyle = platGradient;
-                    this.ctx.fillRect(platform.x, platform.y, platform.width, platform.height);
-                    
-                    // Platform highlight
-                    this.ctx.strokeStyle = platform.moving ? '#aaaaff' : platform.disappearing ? '#ffff00' : '#888';
-                    this.ctx.lineWidth = 2;
-                    this.ctx.strokeRect(platform.x, platform.y, platform.width, platform.height);
-                });
-
-                // Draw spikes
-                this.currentLevelData.spikes.forEach(spike => {
-                    // Spike shadow
-                    this.ctx.fillStyle = 'rgba(139, 0, 0, 0.5)';
-                    this.ctx.fillRect(spike.x + 2, spike.y + 2, spike.width, spike.height);
-                    
-                    // Main spike
-                    const spikeGradient = this.ctx.createLinearGradient(spike.x, spike.y, spike.x, spike.y + spike.height);
-                    spikeGradient.addColorStop(0, '#ff4444');
-                    spikeGradient.addColorStop(1, '#cc0000');
-                    this.ctx.fillStyle = spikeGradient;
-                    this.ctx.fillRect(spike.x, spike.y, spike.width, spike.height);
-                    
-                    // Draw individual spike triangles
-                    this.ctx.fillStyle = '#990000';
-                    const spikeCount = Math.floor(spike.width / 15);
-                    for (let i = 0; i < spikeCount; i++) {
-                        this.ctx.beginPath();
-                        this.ctx.moveTo(spike.x + i * 15, spike.y + spike.height);
-                        this.ctx.lineTo(spike.x + i * 15 + 7, spike.y);
-                        this.ctx.lineTo(spike.x + i * 15 + 15, spike.y + spike.height);
-                        this.ctx.closePath();
-                        this.ctx.fill();
-                    }
-                });
-
-                // Draw enemies
-                this.currentLevelData.enemies.forEach(enemy => {
-                    // Enemy shadow
-                    this.ctx.fillStyle = 'rgba(0, 0, 0, 0.3)';
-                    this.ctx.fillRect(enemy.x + 2, enemy.y + 2, enemy.width, enemy.height);
-                    
-                    // Main enemy
-                    const enemyGradient = this.ctx.createLinearGradient(enemy.x, enemy.y, enemy.x, enemy.y + enemy.height);
-                    enemyGradient.addColorStop(0, '#ff00ff');
-                    enemyGradient.addColorStop(1, '#aa00aa');
-                    this.ctx.fillStyle = enemyGradient;
-                    this.ctx.fillRect(enemy.x, enemy.y, enemy.width, enemy.height);
-                    
-                    // Enemy eyes
-                    this.ctx.fillStyle = '#fff';
-                    this.ctx.fillRect(enemy.x + 5, enemy.y + 5, 4, 4);
-                    this.ctx.fillRect(enemy.x + 11, enemy.y + 5, 4, 4);
-                });
-
-                // Draw goal
-                this.ctx.shadowColor = '#44ff44';
-                this.ctx.shadowBlur = 15;
-                const goalGradient = this.ctx.createLinearGradient(
-                    this.currentLevelData.goal.x, this.currentLevelData.goal.y,
-                    this.currentLevelData.goal.x, this.currentLevelData.goal.y + this.currentLevelData.goal.height
-                );
-                goalGradient.addColorStop(0, '#88ff88');
-                goalGradient.addColorStop(1, '#00cc00');
-                this.ctx.fillStyle = goalGradient;
-                this.ctx.fillRect(this.currentLevelData.goal.x, this.currentLevelData.goal.y, 
-                                this.currentLevelData.goal.width, this.currentLevelData.goal.height);
-                this.ctx.shadowBlur = 0;
-
-                // Draw player
-                this.ctx.shadowColor = '#ffaa00';
-                this.ctx.shadowBlur = 10;
-                const playerGradient = this.ctx.createRadialGradient(
-                    this.player.x + this.player.width/2, this.player.y + this.player.height/2, 0,
-                    this.player.x + this.player.width/2, this.player.y + this.player.height/2, this.player.width/2
-                );
-                playerGradient.addColorStop(0, '#ffcc00');
-                playerGradient.addColorStop(1, '#ff8800');
-                this.ctx.fillStyle = playerGradient;
-                this.ctx.fillRect(this.player.x, this.player.y, this.player.width, this.player.height);
-                
-                // Player details
-                this.ctx.shadowBlur = 0;
-                this.ctx.fillStyle = '#000';
-                this.ctx.fillRect(this.player.x + 8, this.player.y + 8, 6, 6);
-                this.ctx.fillRect(this.player.x + 16, this.player.y + 8, 6, 6);
-                
-                // Player mouth based on movement
-                this.ctx.beginPath();
-                if (this.player.velocityX > 0) {
-                    this.ctx.arc(this.player.x + 22, this.player.y + 19, 4, 0, Math.PI * 2);
-                } else if (this.player.velocityX < 0) {
-                    this.ctx.arc(this.player.x + 8, this.player.y + 19, 4, 0, Math.PI * 2);
-                } else {
-                    this.ctx.rect(this.player.x + 10, this.player.y + 19, 10, 3);
-                }
-                this.ctx.fill();
-            }
-
-            gameLoop() {
-                if (this.gameRunning) {
-                    this.handleInput();
-                    this.updatePhysics();
-                }
-                this.render();
-                requestAnimationFrame(() => this.gameLoop());
-            }
-        }
-
-        // Start the game when page loads
-        window.addEventListener('load', () => {
-            new LevelDevil();
-        });
-    </script>
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/howler/2.2.3/howler.min.js"></script>
+    <script src="js/utils.js"></script>
+    <script src="js/audio.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/traps.js"></script>
+    <script src="js/player.js"></script>
+    <script src="js/levels.js"></script>
+    <script src="js/ui.js"></script>
+    <script src="js/game.js"></script>
 </body>
+
 </html>

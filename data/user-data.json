@@ -1,0 +1,14 @@
+{
+    "users": {},
+    "gameSettings": {
+        "soundEnabled": true,
+        "musicEnabled": true,
+        "controls": "keyboard",
+        "difficulty": "normal"
+    },
+    "leaderboards": {
+        "levelCompletions": {},
+        "fastestTimes": {},
+        "lowestDeaths": {}
+    }
+}
